@@ -1,6 +1,6 @@
 # iHela Client
 
-This is the repository for a Python client for consuming the iHela Crédit Union API for financial services in Burundi. The API gateway can be found on https://testgate.ihela.online/
+This is the repository for a Python client for consuming the iHela Crédit Union API for financial services in Burundi. The API gateway can be found on http://bankingdocs.ihela.bi
 
 ## Get started
 
@@ -50,15 +50,25 @@ The bank list response gives the bank information that can help you provide a co
                 "name": "Ihelá Credit Union",
                 "fullname": "Ihelá Credit Union",
                 "nickname": "ICU",
-                "slug": "ihela-credit-union",
-                "image": "https://testgate.ihela.online/vwmedia/addressbook/companies/ihelalogo_DCklq5H.jpg",
+                "slug": "0000000002",
+                "image": "http://10.30.0.13/media/clients/corporate/2_ihela.png",
                 "about": "Ihelá Credit Union",
-                "logo": "https://testgate.ihela.online/vwmedia/addressbook/companies/ihelalogo_DCklq5H.jpg",
+                "logo": "http://10.30.0.13/media/clients/corporate/2_ihela.png",
                 "logo_icon": "https://testgate.ihela.online/vwmedia/addressbook/companies/icon/ihelacreditunionfondblanc.png",
             },
             "limits_config": None,
-            "account_masked_text": "000000-00",
-            "ihela_account_inside": None,
+            "account_masked_text": None,
+            "api_values" : {
+                "has_lookup": True, 
+                "has_cashin": True, 
+                "has_cashout": True, 
+                "has_integrated_too": False, 
+                "additional_api_list": [
+                    "agent_agent_transfer", 
+                    "agent_lookup"
+                    ]
+                }
+            
         },
         {
             "slug": "MOB-0003",
@@ -72,46 +82,56 @@ The bank list response gives the bank information that can help you provide a co
                 "name": "EcoCash",
                 "fullname": "EcoCash",
                 "nickname": None,
-                "slug": "ecocash",
-                "image": "https://testgate.ihela.online/vwmedia/addressbook/companies/logoEcoCash.gif",
+                "slug": "0000000093",
+                "image": None,
                 "about": "",
-                "logo": "https://testgate.ihela.online/vwmedia/addressbook/companies/logoEcoCash.gif",
-                "logo_icon": "https://testgate.ihela.online/vwmedia/addressbook/companies/icon/logoEcoCash_LfUl0cA.gif",
+                "logo":None,
+                "logo_icon": None,
             },
             "limits_config": None,
             "account_masked_text": "00000000",
-            "ihela_account_inside": None,
+            "is_default": False
+            "api_values" : {
+                "has_lookup": True, 
+                "has_cashin": True, 
+                "has_cashout": True, 
+                "has_integrated_too": False, 
+                "additional_api_list": []
+                }
         },
         {
-            "slug": "MOB-0006",
-            "name": "PesaFlash",
-            "swift_code": None,
-            "bank_code": 6,
-            "bank_type": "MOB",
-            "can_create_account_online": False,
-            "is_active": True,
+            "id": 7, 
+            "slug": "BNQ-0005", 
+            "name": "CRDB", 
+            "swift_code": "CORUBIBU", 
+            "bank_code": 5, 
+            "bank_type": "BNQ", 
+            "can_create_account_online": None, 
+            "is_active": True, 
             "company": {
-                "name": "Pesaflashjklfs",
-                "fullname": "Pesaflashjklfs",
-                "nickname": "-",
-                "slug": "pesaflashjklfs",
-                "image": "https://testgate.ihela.online/vwmedia/addressbook/companies/FINBANK_LANDSCAPE_MxkUXas.png",
-                "about": "Pesaflash",
-                "logo": "https://testgate.ihela.online/vwmedia/addressbook/companies/FINBANK_LANDSCAPE_MxkUXas.png",
-                "logo_icon": "https://testgate.ihela.online/vwmedia/addressbook/companies/icon/FINBANK_LANDSCAPE_A0DFqu8.png",
-            },
-            "limits_config": {
-                "in_minimum": "10000.00",
-                "in_maximum": "50000000.00",
-                "out_minimum": "10000.00",
-                "out_maximum": "50000000.00",
-            },
-            "account_masked_text": None,
-            "ihela_account_inside": None,
-        },
+                    "name": "CRDB",
+                    "fullname": "CRDB", 
+                    "nickname": None, 
+                    "slug": "0000000907",
+                    "image": "http: //10.30.0.13/media/clients/corporate/105_CRDB.png",
+                    "about": "CRDB", 
+                    "logo": "http: //10.30.0.13/media/clients/corporate/105_CRDB.png", "logo_icon": "http://10.30.0.13/media/clients/corporate/105_CRDB_QZLKiPG.png"}, 
+                    "limits_config": None, 
+                    "account_masked_text": None, 
+                    "is_default": False, 
+                    "api_values": {
+                            "has_lookup": False, 
+                            "has_cashin": True, 
+                            "has_cashout": False, 
+                            "has_integrated_too": False, 
+                            "additional_api_list": []
+                }
+            }
     ],
     "count": 3,
     "response_status": 200,
+    "response_message": "Done", 
+    "success": True,
 }
 ```
 
@@ -127,7 +147,20 @@ customer_lookup = cl.customer_lookup(bank_slug=selected_bank["slug"], customer_i
 And you get the acccount_number :
 
 ```python
-{'account_number': '000001-01', 'name': 'Bigirimana Fabrice', 'response_status': 200}
+{
+    {
+        "response_code": "00", 
+        "response_data": 
+            {
+                "account_number": "30001-01-00-0000008906-01-50", 
+                "customer_id": 8906, 
+                "name": "BIGIRIMANA LADISLAS", 
+                "html": None
+                }, 
+        "response_message": "Success", 
+        "success": True, 
+        "response_status": 200
+        }
 ```
 The name can be prompted so that the user can confirm there is no error.
 
@@ -152,30 +185,30 @@ Here is a response sample. You must have a copy of the "code" and the "confirmat
 
 ```python
 {
-	"bill": {
-	    "merchant": {
-	        "title": "Global Test Merchant",
-	    },
-	    "amount": "2000.00",
-	    "currency": 108,
-	    "currency_info": {
-	        "iso_code": 108,
-	        "iso_alpha_code": "BIF",
-	        "title": "BURUNDIAN FRANC",
-	        "abbreviation": "BIF",
-	        "operation_min_amount": "1.00"
-	    },
-	    "description": "Global Test Merchant (1) My description 58646cc904c471d6413e",
-	    "merchant_reference": "58646cc904c471d6413e",
-	    "status": {"label": "Initiated", "value": "I", "css": "tag is-info"},
-	    "expired": False,
-	    "code": "BILL-20200813-B8GUIUDIN0",
-	    "redirect_uri": None,
-	    "confirmation_uri": "https://mytest.ihela.online/u/operations/bill/confirm/BILL-20200813-B8GUIUDIN0",
-	    "payment_reference": None,
-	    "created_at": "2020-08-13T10:24:58.014322Z"
-	},
-	"response_status": 200
+    "bill": {
+        "merchant": {
+            "title": "Global Test Merchant",
+        },
+        "amount": "2000.00",
+        "currency": 108,
+        "currency_info": {
+            "iso_code": 108,
+            "iso_alpha_code": "BIF",
+            "title": "BURUNDIAN FRANC",
+            "abbreviation": "BIF",
+            "operation_min_amount": "1.00"
+        },
+        "description": "Global Test Merchant (1) My description 58646cc904c471d6413e",
+        "merchant_reference": "58646cc904c471d6413e",
+        "status": {"label": "Initiated", "value": "I", "css": "tag is-info"},
+        "expired": False,
+        "code": "BILL-20200813-B8GUIUDIN0",
+        "redirect_uri": None,
+        "confirmation_uri": "https://mytest.ihela.online/u/operations/bill/confirm/BILL-20200813-B8GUIUDIN0",
+        "payment_reference": None,
+        "created_at": "2020-08-13T10:24:58.014322Z"
+    },
+    "response_status": 200
 }
 ```
 

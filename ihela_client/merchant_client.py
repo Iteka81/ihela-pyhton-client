@@ -35,8 +35,8 @@ iHela_AUTH_URL = "oAuth2/authorize/"
 iHela_ENDPOINTS = {
     "PING": "api/v2/ping/",
     "USER_INFO": "api/v2/connected-user/",
-    "BILL_INIT": "api/v2/payments/bill/init/",
-    "BILL_VERIFY": "api/v2/payments/bill/verify/",
+    "BILL_INIT": "api/v2/payments/bill-init/",
+    "BILL_VERIFY": "api/v2/payments/bill-check/",
     "CASHIN": "api/v2/payments/cash-in/",
     # "BANKS": "api/v2/bank/all",
     "BANKS": "api/v2/payments/bank/",
@@ -162,25 +162,27 @@ class MerchantClient:
 
     def init_bill(
         self,
+        debit_bank,
+        debit_account,
         amount,
-        user,
         description,
-        reference,
-        bank=None,
-        bank_client_id=None,
+        merchant_description,
+        merchant_reference,
+        pin_code,
+        payment_product_id=None,
         redirect_uri=None,
     ):
         if self.is_authenticated():
-            if bank and not bank_client_id:
-                bank_client_id = user
             bill_data = {
+                "debit_bank": debit_bank,
+                "debit_account": debit_account,
                 "amount": amount,
                 "description": description,
-                "merchant_reference": reference,
-                "user": user,
-                "bank": bank,
-                "bank_client_id": bank_client_id,
+                "merchant_description": merchant_description,
+                "merchant_reference": merchant_reference,
                 "redirect_uri": redirect_uri,
+                "payment_product_id": payment_product_id,
+                "pin_code": pin_code,
             }
             url = iHela_ENDPOINTS["BILL_INIT"]
             bill_ = requests.post(
@@ -192,8 +194,43 @@ class MerchantClient:
         else:
             return self.no_auth_response
 
-    def verify_bill(self, code, reference):
-        bill_data = {"code": code, "reference": reference}
+    #     self,
+    #     amount,
+    #     user,
+    #     description,
+    #     reference,
+    #     bank=None,
+    #     bank_client_id=None,
+    #     redirect_uri=None,
+    # ):
+    #     if self.is_authenticated():
+    #         if bank and not bank_client_id:
+    #             bank_client_id = user
+    #         bill_data = {
+    #             "amount": amount,
+    #             "description": description,
+    #             "merchant_reference": reference,
+    #             "user": user,
+    #             "bank": bank,
+    #             "bank_client_id": bank_client_id,
+    #             "redirect_uri": redirect_uri,
+    #         }
+    #         url = iHela_ENDPOINTS["BILL_INIT"]
+    #         bill_ = requests.post(
+    #             self.get_url(url), data=bill_data, headers=self.get_auth_headers()
+    #         )
+    #         bill_initiated = self.get_response(bill_)
+
+    #         return bill_initiated
+    #     else:
+    #         return self.no_auth_response
+
+    def verify_bill(self, pin, code, reference):
+        bill_data = {
+            "bill_code": code,
+            "pin_code": pin,
+            "merchant_reference": reference,
+        }
         url = iHela_ENDPOINTS["BILL_VERIFY"]
         bill_ = requests.post(
             self.get_url(url), data=bill_data, headers=self.get_auth_headers()
@@ -279,7 +316,7 @@ if __name__ == "__main__":
 
     #     print("\nBILL VERIFY : ", bill_verif)
 
-    banks = cl.get_bank_list()
+    banks = cl.get_bank_list(list_type="cashout")
 
     print("\nBANKS LIST : ", banks)
 
@@ -297,3 +334,21 @@ if __name__ == "__main__":
     )
 
     print("\nCASHIN TO CLIENT : ", cashin)
+
+    init_bill = cl.init_bill(
+        debit_bank="MF1-0001",
+        debit_account="0000000016-01",
+        amount=600,
+        description="Payment merchant",
+        merchant_description="Payment from client 001 752000",
+        merchant_reference="752000",
+        redirect_uri="https=//myredirecturi.com/payments",
+        payment_product_id="",
+        pin_code="1234",
+    )
+
+    print("\nBILL : ", init_bill)
+
+    bill = cl.verify_bill(code="CODE-20230321-9E29QH1", pin="1234", reference="752000")
+
+    print("\nBILL : ", bill)
