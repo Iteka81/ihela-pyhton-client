@@ -10,18 +10,8 @@ Python client for integration
 import json
 import logging
 
-# import string
-import simplejson
-
-# import urllib.parse
-
-
-try:
-    import secrets
-except ImportError:  # Python < 3.6
-    import random as secrets
-
 import requests
+import simplejson
 
 logger = logging.getLogger(__name__)
 
@@ -35,8 +25,9 @@ iHela_AUTH_URL = "oAuth2/authorize/"
 iHela_ENDPOINTS = {
     "PING": "api/v2/ping/",
     "USER_INFO": "api/v2/connected-user/",
-    "BILL_INIT": "api/v2/payments/bill-init/",
     "BILL_VERIFY": "api/v2/payments/bill-check/",
+    "BILL_INIT": "api/v2/payments/bill/init/",
+    "OPERATION_STATUS": "api/v2/operations/status/",
     "CASHIN": "api/v2/payments/cash-in/",
     # "BANKS": "api/v2/bank/all",
     "BANKS": "api/v2/payments/bank/",
@@ -83,14 +74,21 @@ class MerchantClient:
     def get_response(self, resp):
         try:
             resp_json = dict(resp.json())
-            resp_json["response_status"] = resp.status_code
+            # resp_json["response_status"] = resp.status_code
             logger.debug(resp_json)
             return resp_json
         except (json.decoder.JSONDecodeError, simplejson.errors.JSONDecodeError):
             logger.error("IHELA_CLIENT_ERROR : %s" % resp.text)
             return {
-                "errors": {"request": "An error occured during request"},
-                "bill": {},
+                "success": False,
+                "response_code": "01",
+                "response_data": {
+                    "errors": {
+                        "request": "An error occured during request",
+                        "status": resp.status_code,
+                    }
+                },
+                "response_message": "An error occured during request",
             }
 
     def get_url(self, url):
@@ -268,6 +266,19 @@ class MerchantClient:
         else:
             return self.no_auth_response
 
+    def operations_status(self, external_reference, ihela_reference):
+        status_data = {
+            "external_reference": external_reference,
+            "reference": ihela_reference,
+        }
+        url = iHela_ENDPOINTS["OPERATION_STATUS"]
+        status_ = requests.post(
+            self.get_url(url), data=status_data, headers=self.get_auth_headers()
+        )
+        ope_status = self.get_response(status_)
+
+        return ope_status
+
     def get_bank_list(self, list_type=None):
         if not list_type:
             list_type = "cashin"
@@ -329,7 +340,7 @@ if __name__ == "__main__":
         "000016-01",
         "Pierre Claver Koko",
         20000,
-        str(secrets.token_hex(10)),
+        # str(secrets.token_hex(10)),
         "Cashin description",
     )
 
